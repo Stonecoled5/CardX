@@ -1,6 +1,7 @@
 package com.cs407.cardx;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check if the user is already logged in
+        SharedPreferences sharedPreferences = getSharedPreferences("com.cs407.cardx", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn) {
+            // User is already logged in, go directly to CardWalletActivity
+            Intent intent = new Intent(MainActivity.this, CardWalletActivity.class);
+            startActivity(intent);
+            finish(); // Close MainActivity
+            return; // Prevents the rest of the code from executing
+        }
+
         setContentView(R.layout.activity_main);
 
         Button signInButton = findViewById(R.id.buttonSignIn);
