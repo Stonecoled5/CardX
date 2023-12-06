@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: Implement your login logic here
+                // TODO: Implement login logic here
                 // If login is successful, then save login state and navigate to the CardWalletActivity:
 
                 // Save login state
