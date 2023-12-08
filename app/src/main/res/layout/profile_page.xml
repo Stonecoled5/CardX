@@ -83,6 +83,8 @@
             android:id="@+id/avatarProfile"
             android:layout_width="96dp"
             android:layout_height="96dp"
+            android:background="#FFFFFF"
+            android:backgroundTint="#FFFFFF"
             android:src="@drawable/avatar" />
 
         <Space
@@ -266,7 +268,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
@@ -286,8 +288,8 @@
             android:layout_weight="1"
             android:ems="10"
             android:enabled="false"
-            android:textColor="@drawable/edit_text_selector"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textColor="@drawable/edit_text_selector" />
 
         <Space
             android:layout_width="wrap_content"
@@ -295,5 +297,22 @@
             android:layout_weight="1" />
 
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/logOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/white"
+            android:onClick="logOut"
+            android:text="Log Out"
+            android:textColor="#00BCD4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
