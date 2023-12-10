@@ -63,14 +63,9 @@ public class QR extends AppCompatActivity {
                 InputStream inputStream = conn.getInputStream();
 
                 // Process the blob data as needed
-                // For example, you can read the data into a byte array
+                // read the data into a byte array
                 byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    // Process the data in the buffer
-                    // For simplicity, you can print it to the console
-                    System.out.write(buffer, 0, bytesRead);
-                }
+                int bytesRead = inputStream.read(buffer);
                 conn.disconnect();
 
                 final String logTag = "SignupError";
@@ -103,11 +98,8 @@ public class QR extends AppCompatActivity {
         if (buffer == null || buffer.length < 1)
             return;
         try {
-            //response = response.replace("\"", "");
-            //response = response.replace("\\n", System.lineSeparator());
             Bitmap decodedByte = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
             QRCode.setImageBitmap(decodedByte);
-            //editor.putString("QRCode", response);
         }
         catch (Exception e) {
             Log.e("Decode", "Exception during decoding: " + e,e);

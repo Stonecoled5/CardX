@@ -30,10 +30,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,15 +53,22 @@ public class ProfilePage extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
     private ImageView avatarView;
+    private EditText companyEdit, occupationEdit, emailEdit, phoneEdit, schoolEdit, nameEdit, bioEdit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_page);
         avatarView = findViewById(R.id.avatarProfile);
+        companyEdit = findViewById(R.id.companyEdit);
+        occupationEdit = findViewById(R.id.occupationEdit);
+        phoneEdit = findViewById(R.id.phoneEdit);
+        emailEdit = findViewById(R.id.emailEdit);
+        schoolEdit = findViewById(R.id.schoolEdit);
+        nameEdit = findViewById(R.id.name);
+        bioEdit = findViewById(R.id.bio);
         sharedPreferences = getSharedPreferences("com.cs407.cardx", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putString("userId", "7");
-        getUserInfo(sharedPreferences.getString("userId", "7"));
+        getUserInfo();
         pickMedia =
                 registerForActivityResult(new PickVisualMedia(), new ActivityResultCallback<Uri>() {
                     @Override
@@ -81,40 +86,17 @@ public class ProfilePage extends AppCompatActivity {
                     }
                 });
 
-        ImageView backView = findViewById(R.id.back);
-        backView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent oldIntent = getIntent();
-                String previousActivity = oldIntent.getStringExtra("previousActivity");
-                try{
-                    Class class_name = Class.forName(previousActivity);
-                    Intent intent = new Intent(getApplicationContext(), class_name);
-                    startActivity(intent);
-                } catch(Exception e) {
-                    Log.e("Going Back", previousActivity+ " class not found");
-                }
-            }
-        });
-
         ImageView editView = findViewById(R.id.edit);
         editView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 canEdit = !canEdit;
-                EditText companyEdit = findViewById(R.id.companyEdit);
                 companyEdit.setEnabled(canEdit);
-                EditText occupationEdit = findViewById(R.id.occupationEdit);
                 occupationEdit.setEnabled(canEdit);
-                EditText emailEdit = findViewById(R.id.emailEdit);
                 emailEdit.setEnabled(canEdit);
-                EditText phoneEdit = findViewById(R.id.phoneEdit);
                 phoneEdit.setEnabled(canEdit);
-                EditText schoolEdit = findViewById(R.id.schoolEdit);
                 schoolEdit.setEnabled(canEdit);
-                EditText nameEdit = findViewById(R.id.name);
                 nameEdit.setEnabled(canEdit);
-                EditText bioEdit = findViewById(R.id.bio);
                 bioEdit.setEnabled(canEdit);
                 Uri imgUri;
                 if (canEdit) {
@@ -137,6 +119,15 @@ public class ProfilePage extends AppCompatActivity {
                             Toast.makeText(ProfilePage.this, "Encoding of Image failed. Check Logcat for details.", Toast.LENGTH_LONG).show();
                         }
                     }
+                    editor.putString("avatar",picBase64);
+                    editor.putString("company",companyEdit.getText().toString());
+                    editor.putString("occupation",occupationEdit.getText().toString());
+                    editor.putString("email",emailEdit.getText().toString());
+                    editor.putString("phone",phoneEdit.getText().toString());
+                    editor.putString("school",schoolEdit.getText().toString());
+                    editor.putString("name",nameEdit.getText().toString());
+                    editor.putString("bio",bioEdit.getText().toString());
+                    editor.apply();
                     avatarView.setDrawingCacheEnabled(false);
                     editUserInfo(sharedPreferences.getString("userId", "7"), companyEdit.getText().toString(),
                             occupationEdit.getText().toString(),
@@ -211,7 +202,7 @@ public class ProfilePage extends AppCompatActivity {
                     } else {
                         // Log the error response in Logcat
                         Log.e(logTag, "Edit failed with response code " + responseCode + ": " + response);
-                        Toast.makeText(ProfilePage.this, "Edit failed. Check Logcat for details.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ProfilePage.this, response.substring(11, response.length()-2).replace("\"","").replace(System.lineSeparator(),""), Toast.LENGTH_LONG).show();
                     }
                 });
             } catch (Exception e) {
@@ -228,111 +219,21 @@ public class ProfilePage extends AppCompatActivity {
         });
     }
 
-    private void getUserInfo(String userId) {
-        final String registerUrl = "https://verified-jay-correct.ngrok-free.app/getUserInfo";
+    private void getUserInfo() {
 
-        executorService.execute(() -> {
-            HttpURLConnection conn = null;
-            try {
-                // Create the URL object with the endpoint and parameters
-                URL url = new URL(registerUrl + "?userId=" + userId);
-                conn = (HttpURLConnection) url.openConnection();
-
-                // Set the request method to GET
-                conn.setRequestMethod("GET");
-
-                // Get the response code
-                int responseCode = conn.getResponseCode();
-
-                // Read the response from the input stream
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line;
-                StringBuilder responseBuilder = new StringBuilder();
-
-                while ((line = reader.readLine()) != null) {
-                    responseBuilder.append(line);
-                }
-                String response = responseBuilder.toString();
-                // Close the connection and print the response
-                reader.close();
-                conn.disconnect();
-
-                final String logTag = "SignupError";
-
-                handler.post(() -> {
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        mapInfoToSections(response);
-                    } else {
-                        // Log the error response in Logcat
-                        Log.e(logTag, "Info retrieval failure with response code " + responseCode + ": " + response);
-                        Toast.makeText(ProfilePage.this, "Failed to retrieve user information. Check Logcat for details.", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    // Log the exception
-                    Log.e("SignupError", "Exception during information retrieval: " + e.getMessage());
-                    Toast.makeText(ProfilePage.this, "Failed to retrieve user information. Check Logcat for details.", Toast.LENGTH_LONG).show();
-                });
-            } finally {
-                if (conn != null) {
-                    conn.disconnect();
-                }
-            }
-        });
-    }
-
-    public void mapInfoToSections(String response) {
-        String[] responseArray = response.split(",  ");
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        for (String s : responseArray) {
-            if (s.contains("avatar")) {
-                String avatarString = s.substring(13,s.length());
-                if (avatarString.contains("null"))
-                    continue;
-                try {
-                    avatarString = avatarString.replace("\"", "");
-                    avatarString = avatarString.replace("\\n", System.lineSeparator());
-                    byte[] decodedString = Base64.decode(avatarString, Base64.DEFAULT);
-                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    avatarView.setImageBitmap(decodedByte);
-                    editor.putString("avatar", avatarString);
-                }
-                catch (Exception e) {
-                    Log.e("Decode", "Exception during decoding: " + e,e);
-                }
-            }
-            else if (s.contains("bio")) {
-                mapInfoToSectionsHelper(s,7,s.length(),findViewById(R.id.bio),"bio", editor);
-            }
-            else if (s.contains("company")) {
-                mapInfoToSectionsHelper(s,11,s.length(),findViewById(R.id.companyEdit),"company", editor);
-            }
-            else if (s.contains("email")) {
-                mapInfoToSectionsHelper(s,9,s.length(),findViewById(R.id.emailEdit),"email", editor);
-            }
-            else if (s.contains("name")) {
-                mapInfoToSectionsHelper(s,8,s.length(),findViewById(R.id.name),"name", editor);
-            }
-            else if (s.contains("occupation")) {
-                mapInfoToSectionsHelper(s,14,s.length(),findViewById(R.id.occupationEdit),"occupation", editor);
-            }
-            else if (s.contains("phone")) {
-                mapInfoToSectionsHelper(s,9,s.length(),findViewById(R.id.phoneEdit),"phone", editor);
-            }
-            else if (s.contains("school")) {
-                mapInfoToSectionsHelper(s,10,s.length()-1,findViewById(R.id.schoolEdit),"school", editor);
-            }
-        }
-    }
-
-    public void mapInfoToSectionsHelper(String s, int startIndex, int endIndex, EditText editText, String prefId, SharedPreferences.Editor editor) {
-        String string = s.substring(startIndex, endIndex);
-        if (string.contains("null"))
-            return;
-        string = string.replace("\"", "");
-        editText.setText(string);
-        editor.putString(prefId, string);
+        byte[] decodedString = Base64.decode(sharedPreferences.getString("avatar",""), Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        if (decodedString == Base64.decode("", Base64.DEFAULT))
+            avatarView.setImageURI(Uri.parse("android.resource://com.cs407.cardx/"+R.drawable.avatar));
+        else
+            avatarView.setImageBitmap(decodedByte);
+        companyEdit.setText(sharedPreferences.getString("company",""));
+        occupationEdit.setText(sharedPreferences.getString("occupation",""));
+        emailEdit.setText(sharedPreferences.getString("email",""));
+        phoneEdit.setText(sharedPreferences.getString("phone",""));
+        schoolEdit.setText(sharedPreferences.getString("school",""));
+        nameEdit.setText(sharedPreferences.getString("name",""));
+        bioEdit.setText(sharedPreferences.getString("bio",""));
     }
 
     public void handleAvatarEdit() {
@@ -375,7 +276,10 @@ public class ProfilePage extends AppCompatActivity {
         }
     }
 
-    public void logOut() {
-
+    public void logOut(View view) {
+        editor.clear().apply();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
