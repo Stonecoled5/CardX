@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -65,6 +66,15 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
             @Override
             public void onClick(View v) {
                 requestCameraPermission();
+            }
+        });
+
+        ImageView profile = findViewById(R.id.ivPersonIcon);
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ProfilePage.class);
+                startActivity(intent);
             }
         });
 

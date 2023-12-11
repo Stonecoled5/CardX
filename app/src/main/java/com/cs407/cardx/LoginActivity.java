@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     // Read the response
                     int responseCode = conn.getResponseCode();
-
+                    String responseString = "";
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                         String inputLine;
@@ -81,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                         while ((inputLine = in.readLine()) != null) {
                             response.append(inputLine);
                         }
+                        responseString = response.toString();
                         in.close();
 
                         // Switch to the main thread to update the UI
@@ -123,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
         getUserInfo(userId);
         // Navigate to the CardWalletActivity
-        Intent intent = new Intent(LoginActivity.this, QR.class);
+        Intent intent = new Intent(LoginActivity.this, CardWalletActivity.class);
         startActivity(intent);
         finish();
     }

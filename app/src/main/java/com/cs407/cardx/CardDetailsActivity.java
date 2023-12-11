@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +76,17 @@ public class CardDetailsActivity extends AppCompatActivity {
             schoolTextView.setText("School: " + currentCard.getSchool());
             bioTextView.setText("Bio: " + currentCard.getBio());
         }
+
+        ImageView profile = findViewById(R.id.ivPersonIcon);
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ProfilePage.class);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     private boolean isUsersPersonalCard(Card card) {

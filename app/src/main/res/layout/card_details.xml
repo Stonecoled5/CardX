@@ -26,10 +26,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:fontFamily="@font/sf_pro_rounded"
+            android:fontFamily="@font/sf_pro_rounded_regular"
             android:text="CardX"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/ivPersonIcon"
@@ -37,7 +39,7 @@
             android:layout_height="49dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            app:srcCompat="@drawable/profile_icon" />
+            app:srcCompat="@drawable/avatar" />
     </RelativeLayout>
 
     <androidx.cardview.widget.CardView
@@ -66,51 +68,51 @@
                 android:id="@+id/nameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Name:"
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Name: "
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <TextView
                 android:id="@+id/companyTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Company:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Company: " />
 
             <TextView
                 android:id="@+id/occupationTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Occupation:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Occupation: " />
 
             <TextView
                 android:id="@+id/emailTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Email:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Email: " />
 
             <TextView
                 android:id="@+id/phoneTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Phone:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Phone: " />
 
             <TextView
                 android:id="@+id/schoolTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="School:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="School: " />
 
             <TextView
                 android:id="@+id/bioTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_rounded"
-                android:text="Bio:" />
+                android:fontFamily="@font/sf_pro_rounded_regular"
+                android:text="Bio: " />
 
 
         </LinearLayout>
@@ -125,33 +127,21 @@
         android:layout_marginEnd="157dp"
         android:layout_marginBottom="20dp"
         android:backgroundTint="#717171"
-        android:fontFamily="@font/sf_pro_rounded"
+        android:fontFamily="@font/sf_pro_rounded_regular"
         android:text="Edit"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintBottom_toTopOf="@+id/deleteButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageViewQRCode"
-        android:layout_width="61dp"
-        android:layout_height="67dp"
-        android:layout_marginStart="175dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginBottom="18dp"
-        android:src="@drawable/qr_code"
-        app:layout_constraintBottom_toTopOf="@+id/editButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <Button
         android:id="@+id/deleteButton"
-        android:onClick="delCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#000000"
-        android:fontFamily="@font/sf_pro_rounded"
+        android:fontFamily="@font/sf_pro_rounded_regular"
+        android:onClick="delCard"
         android:text="Delete Card"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

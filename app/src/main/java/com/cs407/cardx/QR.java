@@ -36,7 +36,6 @@ public class QR extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ProfilePage.class);
-                intent.putExtra("previousActivity", "com.cs407.cardx.QR");
                 startActivity(intent);
             }
         });
@@ -104,6 +103,12 @@ public class QR extends AppCompatActivity {
         catch (Exception e) {
             Log.e("Decode", "Exception during decoding: " + e,e);
         }
+    }
+
+    public void go_to_profile(View view) {
+        Intent intent = new Intent(this, ProfilePage.class);
+        startActivity(intent);
+        finish();
     }
 
 }
