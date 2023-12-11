@@ -39,7 +39,7 @@ public class QR extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        getQRcode(sharedPreferences.getString("userId", "15"));
+        getQRcode(sharedPreferences.getString("userId", ""));
     }
 
     public void getQRcode(String userId) {

@@ -1,6 +1,8 @@
 package com.cs407.cardx;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
@@ -30,12 +33,15 @@ public class CardDetailsActivity extends AppCompatActivity {
     private TextView bioTextView;
     private Button editButton;
     private Card currentCard;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.card_details);
-
+        sharedPreferences = getSharedPreferences("com.cs407.cardx", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         // Initialize TextViews
         nameTextView = findViewById(R.id.nameTextView);
         companyTextView = findViewById(R.id.companyTextView);
@@ -49,22 +55,7 @@ public class CardDetailsActivity extends AppCompatActivity {
         // Retrieve the Card object from the intent
         currentCard = (Card) getIntent().getSerializableExtra("card");
 
-        // Determine if the currentCard is the user's personal card and set the visibility accordingly
-        if (isUsersPersonalCard(currentCard)) {
-            editButton.setVisibility(View.VISIBLE);
-            editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Start the CardDesignActivity
-                    Intent intent = new Intent(String.valueOf(CardDetailsActivity.class)); // add edit card page to this
-                    // Pass the Card object to the editing activity if needed
-                    intent.putExtra("card", (Serializable) currentCard);
-                    startActivity(intent);
-                }
-            });
-        } else {
-            editButton.setVisibility(View.GONE);
-        }
+        editButton.setVisibility(View.GONE);
 
         if (currentCard != null) {
             // Set the TextViews with the Card's details
@@ -98,7 +89,12 @@ public class CardDetailsActivity extends AppCompatActivity {
         CardService service = ApiClient.getClient();
 
         //replace with userid and cardid to delete
-        service.deleteCard("2", "3").enqueue(new Callback<ResponseBody>() {
+        String cardUserId = getIntent().getExtras().get("cardUserId").toString();
+        if (cardUserId.equals("")) {
+            Toast.makeText(CardDetailsActivity.this, "Card User Id Null", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        service.deleteCard(sharedPreferences.getString("userId",""), getIntent().getExtras().get("cardUserId").toString()).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
@@ -107,6 +103,8 @@ public class CardDetailsActivity extends AppCompatActivity {
                     Toast.makeText(CardDetailsActivity.this, "Card deleted successfully", Toast.LENGTH_SHORT).show();
 
                     setResult(RESULT_OK);
+                    Intent intent = new Intent(getApplicationContext(), CardWalletActivity.class);
+                    startActivity(intent);
                     finish(); // Close the CardDetailsActivity
                 } else {
                     // Server returned an error response

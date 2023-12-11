@@ -1,5 +1,6 @@
 package com.cs407.cardx;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -19,8 +20,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -130,106 +136,34 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getUserInfo(String userId) {
-        final String registerUrl = "https://verified-jay-correct.ngrok-free.app/getUserInfo";
-
-        executorService.execute(() -> {
-            HttpURLConnection conn = null;
-            try {
-                // Create the URL object with the endpoint and parameters
-                URL url = new URL(registerUrl + "?userId=" + userId);
-                conn = (HttpURLConnection) url.openConnection();
-
-                // Set the request method to GET
-                conn.setRequestMethod("GET");
-
-                // Get the response code
-                int responseCode = conn.getResponseCode();
-
-                // Read the response from the input stream
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line;
-                StringBuilder responseBuilder = new StringBuilder();
-
-                while ((line = reader.readLine()) != null) {
-                    responseBuilder.append(line);
-                }
-                String response = responseBuilder.toString();
-                // Close the connection and print the response
-                reader.close();
-                conn.disconnect();
-
-                final String logTag = "SignupError";
-
-                handler.post(() -> {
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        putInfoInSharedPreferences(response);
-                    } else {
-                        // Log the error response in Logcat
-                        Log.e(logTag, "Info retrieval failure with response code " + responseCode + ": " + response);
-                        Toast.makeText(LoginActivity.this, "Failed to retrieve user information. Check Logcat for details.", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    // Log the exception
-                    Log.e("SignupError", "Exception during information retrieval: " + e.getMessage());
-                    Toast.makeText(LoginActivity.this, "Failed to retrieve user information. Check Logcat for details.", Toast.LENGTH_LONG).show();
-                });
-            } finally {
-                if (conn != null) {
-                    conn.disconnect();
-                }
-            }
-        });
+        CardService cardService = ApiClient.getClient();
+       cardService.getUserInfo(userId).enqueue(new Callback<List<Card>>() {
+           @Override
+           public void onResponse(@NonNull Call<List<Card>> call, @NonNull Response<List<Card>> response) {
+               if (response.isSuccessful() && response.body() != null) {
+                   List<Card> cards = response.body();
+                   putInfoInSharedPreferences(cards.get(0));
+               } else {
+                   Log.e("CardWalletActivity", "Error getting card details");
+               }
+           }
+           @Override
+           public void onFailure(@NonNull Call<List<Card>> call, @NonNull Throwable t) {
+               Log.e("CardWalletActivity", "Failure getting card details", t);
+           }
+       });
     }
 
-    public void putInfoInSharedPreferences(String response) {
-        String[] responseArray = response.split(",  ");
-        for (String s : responseArray) {
-            if (s.contains("avatar")) {
-                String avatarString = s.substring(13);
-                if (avatarString.contains("null"))
-                    continue;
-                try {
-                    avatarString = avatarString.replace("\"", "");
-                    avatarString = avatarString.replace("\\n", System.lineSeparator());
-                    editor.putString("avatar", avatarString);
-                    editor.apply();
-                }
-                catch (Exception e) {
-                    Log.e("Decode", "Exception during decoding: " + e,e);
-                }
-            }
-            else if (s.contains("bio")) {
-                putInfoInSharedPreferencesHelper(s,7,s.length(),"bio");
-            }
-            else if (s.contains("company")) {
-                putInfoInSharedPreferencesHelper(s,11,s.length(),"company");
-            }
-            else if (s.contains("email")) {
-                putInfoInSharedPreferencesHelper(s,9,s.length(),"email");
-            }
-            else if (s.contains("name")) {
-                putInfoInSharedPreferencesHelper(s,8,s.length(),"name");
-            }
-            else if (s.contains("occupation")) {
-                putInfoInSharedPreferencesHelper(s,14,s.length(),"occupation");
-            }
-            else if (s.contains("phone")) {
-                putInfoInSharedPreferencesHelper(s,9,s.length(),"phone");
-            }
-            else if (s.contains("school")) {
-                putInfoInSharedPreferencesHelper(s,10,s.length()-1,"school");
-            }
-        }
-    }
-
-    public void putInfoInSharedPreferencesHelper(String s, int startIndex, int endIndex, String prefId) {
-        String string = s.substring(startIndex, endIndex);
-        if (string.contains("null"))
-            return;
-        string = string.replace("\"", "");
-        editor.putString(prefId, string);
+    public void putInfoInSharedPreferences(Card card) {
+        editor.putString("avatar", card.getAvatar());
+        editor.putString("bio", card.getBio());
+        editor.putString("company", card.getCompany());
+        editor.putString("email", card.getEmail());
+        editor.putString("name", card.getName());
+        editor.putString("occupation", card.getOccupation());
+        editor.putString("phone", card.getPhone());
+        editor.putString("school", card.getSchool());
         editor.apply();
     }
+
 }

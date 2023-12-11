@@ -1,6 +1,8 @@
 package com.cs407.cardx;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -37,12 +39,16 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
     private CardsAdapter cardsAdapter;
     private List<Card> cardList;
     private CardService cardService;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+    private List<Integer> userIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.card_wallet);
-
+        sharedPreferences = getSharedPreferences("com.cs407.cardx", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         // Initialize cardList
         cardList = new ArrayList<>();
 
@@ -75,11 +81,12 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ProfilePage.class);
                 startActivity(intent);
+                finish();
             }
         });
 
         // Fetch cards using the user ID
-        getCards("2"); // replace with actual user ID
+        getCards(sharedPreferences.getString("userId","")); // replace with actual user ID
     }
 
     @Override
@@ -87,46 +94,58 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         Card card = cardList.get(position); // Make sure you're retrieving a Card object
         Intent intent = new Intent(this, CardDetailsActivity.class);
         intent.putExtra("card", card); // Put the Card object
+        intent.putExtra("cardUserId", userIds.get(position));
         startActivityForResult(intent, CARD_DETAILS_REQUEST);
+        finish();
     }
 
     private void getCards(String userId) {
         cardService.getCards(userId).enqueue(new Callback<CardIdsResponse>() {
             @Override
-            public void onResponse(Call<CardIdsResponse> call, Response<CardIdsResponse> response) {
+            public void onResponse(@NonNull Call<CardIdsResponse> call, @NonNull Response<CardIdsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Integer> userIds = response.body().getCardUserIds();
-                    for (Integer id : userIds) {
-                        getCardDetails(id.toString());
-                    }
+                    userIds = response.body().getCardUserIds();
+                    getCardDetails();
                 } else {
                     Log.e("CardWalletActivity", "Error getting card user IDs");
                 }
             }
 
             @Override
-            public void onFailure(Call<CardIdsResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<CardIdsResponse> call, @NonNull Throwable t) {
                 Log.e("CardWalletActivity", "Failure getting card user IDs", t);
             }
         });
     }
 
-    private void getCardDetails(String cardUserId) {
-        cardService.getUserInfo(cardUserId).enqueue(new Callback<Card>() {
+    private void getCardDetails() {
+        String userIdList = "";
+        if (userIds.size() == 0 )
+            userIdList = "-1";
+        else{
+            for (Integer id: userIds) {
+                userIdList = userIdList.concat(id.toString());
+                if (!id.equals(userIds.get(userIds.size()-1)))
+                    userIdList = userIdList.concat(",");
+            }
+        }
+        cardService.getUserInfo(userIdList).enqueue(new Callback<List<Card>>() {
             @Override
-            public void onResponse(Call<Card> call, Response<Card> response) {
+            public void onResponse(@NonNull Call<List<Card>> call, @NonNull Response<List<Card>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Card card = response.body();
-                    cardList.add(card);
-                    cardsAdapter.setCards(cardList);
-                    cardsAdapter.notifyDataSetChanged();
+                    List<Card> cards = response.body();
+                    for(Card card : cards) {
+                        cardList.add(card);
+                        cardsAdapter.setCards(cardList);
+                        cardsAdapter.notifyDataSetChanged();
+                    }
                 } else {
                     Log.e("CardWalletActivity", "Error getting card details");
                 }
             }
 
             @Override
-            public void onFailure(Call<Card> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Card>> call, @NonNull Throwable t) {
                 Log.e("CardWalletActivity", "Failure getting card details", t);
             }
         });
@@ -135,15 +154,15 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
     //add card should be called after you already have the card you want to add
     public void addCard(View view) {
         CardService service = ApiClient.getClient();
-        service.addCard("2", "7").enqueue(new Callback<ResponseBody>() {
+        service.addCard(sharedPreferences.getString("userId",""), "7").enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     // Parse the successful response if necessary
                     Log.d("CardWalletActivity", "Card added successfully");
 
                     // Assuming you want to refresh the card list after adding
-                    getCards("2"); // Replace "2" with the actual userId
+                    getCards(sharedPreferences.getString("userId","")); // Replace "2" with the actual userId
 
                     // inform the user of success
                     Toast.makeText(CardWalletActivity.this, "Card added successfully", Toast.LENGTH_SHORT).show();
@@ -157,7 +176,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 // Failure case like no internet connection or server down
                 Log.e("CardWalletActivity", "Add card failed", t);
 
@@ -210,7 +229,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         } else if (requestCode == CARD_DETAILS_REQUEST && resultCode == RESULT_OK) {
             // Handling the result from CardDetailsActivity
             // The card was deleted, refresh the cards list
-            getCards("2"); // Replace "2" with the actual userId
+            getCards(sharedPreferences.getString("userId", "")); // Replace "2" with the actual userId
         }
     }
 
