@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,10 +20,13 @@
         android:theme="@style/Theme.CardX"
         tools:targetApi="31">
         <activity
+            android:name=".CardListItemActivity"
+            android:exported="false" />
+        <activity
             android:name=".CardDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".CardWallet"
+            android:name=".CardWalletActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
