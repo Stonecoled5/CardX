@@ -103,6 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
+                                Log.e("Login", String.valueOf(responseCode));
                                 Toast.makeText(LoginActivity.this, "Login failed: Incorrect Username/password", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -137,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void getUserInfo(String userId) {
         CardService cardService = ApiClient.getClient();
-       cardService.getUserInfo(userId).enqueue(new Callback<List<Card>>() {
+       cardService.getUsersInfo(userId).enqueue(new Callback<List<Card>>() {
            @Override
            public void onResponse(@NonNull Call<List<Card>> call, @NonNull Response<List<Card>> response) {
                if (response.isSuccessful() && response.body() != null) {

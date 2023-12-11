@@ -18,7 +18,7 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="25dp"
+            android:layout_width="27dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/appNameProfile"
-            android:layout_width="262dp"
+            android:layout_width="226dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/sf_pro_rounded_regular"
             android:gravity="center"
@@ -41,9 +41,9 @@
             android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="43dp"
+            android:layout_height="62dp"
+            android:layout_weight="0"
             android:orientation="vertical">
 
             <Space
@@ -52,8 +52,8 @@
 
             <ImageView
                 android:id="@+id/edit"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="38dp"
+                android:layout_height="33dp"
                 android:paddingTop="0dp"
                 android:paddingRight="2dp"
                 android:src="@drawable/edit" />
@@ -93,12 +93,13 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:enabled="false"
         android:fontFamily="@font/sf_pro_rounded_regular"
-        android:background="@android:color/transparent"
         android:gravity="center"
-        android:text="Name"
+        android:hint="Name"
         android:maxLength="40"
+        android:text="Name"
         android:textColor="@drawable/edit_text_selector"
         android:textSize="22sp" />
 
@@ -119,9 +120,10 @@
             android:background="@android:color/transparent"
             android:enabled="false"
             android:gravity="center"
+            android:hint="Bio"
+            android:maxLength="100"
             android:singleLine="false"
             android:text="Bio"
-            android:maxLength="100"
             android:textColor="@drawable/edit_text_selector"
             android:textSize="18sp" />
 
@@ -142,10 +144,10 @@
 
         <TextView
             android:id="@+id/company"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
             android:layout_height="50dp"
             android:gravity="left"
-            android:paddingLeft="50sp"
+            android:paddingLeft="10sp"
             android:text="Company:"
             android:textColor="#000000"
             android:textSize="18sp" />
@@ -175,10 +177,10 @@
 
         <TextView
             android:id="@+id/job"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
             android:layout_height="50dp"
             android:gravity="left"
-            android:paddingLeft="50sp"
+            android:paddingLeft="10sp"
             android:text="Occupation:"
             android:textColor="#000000"
             android:textSize="18sp" />
@@ -206,10 +208,10 @@
 
         <TextView
             android:id="@+id/email"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
             android:layout_height="50dp"
             android:gravity="left"
-            android:paddingLeft="50sp"
+            android:paddingLeft="10sp"
             android:text="Email:"
             android:textColor="#000000"
             android:textSize="18sp" />
@@ -237,10 +239,10 @@
 
         <TextView
             android:id="@+id/phone"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
             android:layout_height="50dp"
             android:gravity="left"
-            android:paddingLeft="50sp"
+            android:paddingLeft="10sp"
             android:textColor="#000000"
             android:text="Phone:"
             android:textSize="18sp" />
@@ -269,10 +271,10 @@
 
         <TextView
             android:id="@+id/school"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
             android:layout_height="50dp"
             android:gravity="left"
-            android:paddingLeft="50sp"
+            android:paddingLeft="10sp"
             android:text="School:"
             android:textColor="#000000"
             android:textSize="18sp" />

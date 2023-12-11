@@ -14,7 +14,7 @@ public interface CardService {
     Call<CardIdsResponse> getCards(@Query("userId") String userId);
 
     @GET("getUsersInfo")
-    Call<List<Card>> getUserInfo(@Query("userIds") String userId);
+    Call<List<Card>> getUsersInfo(@Query("userIds") String userId);
 
     @POST("addCard")
     Call<ResponseBody> addCard(

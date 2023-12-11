@@ -129,7 +129,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
                     userIdList = userIdList.concat(",");
             }
         }
-        cardService.getUserInfo(userIdList).enqueue(new Callback<List<Card>>() {
+        cardService.getUsersInfo(userIdList).enqueue(new Callback<List<Card>>() {
             @Override
             public void onResponse(@NonNull Call<List<Card>> call, @NonNull Response<List<Card>> response) {
                 if (response.isSuccessful() && response.body() != null) {
