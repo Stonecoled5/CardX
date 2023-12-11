@@ -60,13 +60,13 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         cardsAdapter.setClickListener(this);
 
         // Initialize the "Add Card" button and set an OnClickListener
-//        Button addCardButton = findViewById(R.id.btnAddCard); // Replace with your button's ID
-//        addCardButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                requestCameraPermission();
-//            }
-//        });
+        Button addCardButton = findViewById(R.id.btnAddCard); // Replace with your button's ID
+        addCardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestCameraPermission();
+            }
+        });
 
         // Fetch cards using the user ID
         getCards("2"); // replace with actual user ID

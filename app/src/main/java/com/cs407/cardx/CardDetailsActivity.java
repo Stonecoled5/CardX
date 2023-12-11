@@ -84,6 +84,8 @@ public class CardDetailsActivity extends AppCompatActivity {
 
     public void delCard(View view) {
         CardService service = ApiClient.getClient();
+
+        //replace with userid and cardid to delete
         service.deleteCard("2", "3").enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

@@ -4,17 +4,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button1"
+    <TextView
+        android:id="@+id/textViewAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="363dp"
-        android:onClick="clickFunction"
-        android:text="Click Me"
+        android:layout_marginTop="190dp"
+        android:layout_marginBottom="126dp"
+        android:fontFamily="@font/sf_pro_rounded_regular"
+        android:text="CardX"
+        android:textColor="@color/darkBlue"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSignIn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonSignIn"
+        android:layout_width="104dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="@color/brightBlue"
+        android:fontFamily="@font/sf_pro_rounded_regular"
+        android:text="Sign In"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSignUp"
+        app:layout_constraintEnd_toEndOf="@+id/buttonSignUp"
+        app:layout_constraintStart_toStartOf="@+id/buttonSignUp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAppName" />
+
+    <Button
+        android:id="@+id/buttonSignUp"
+        android:layout_width="104dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="239dp"
+        android:backgroundTint="@color/white"
+        android:fontFamily="@font/sf_pro_rounded_regular"
+        android:text="Sign Up"
+        android:textColor="@color/darkBlue"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSignIn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
