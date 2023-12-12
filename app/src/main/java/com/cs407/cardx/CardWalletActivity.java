@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +34,8 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
     private static final int CARD_DETAILS_REQUEST = 1; // Unique request code
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     private static final int CAMERA_REQUEST_CODE = 101;
+    private ActivityResultLauncher<String> requestCameraPermissionLauncher;
+    private ActivityResultLauncher<Intent> cameraActivityResultLauncher;
     private RecyclerView cardsRecyclerView;
     private CardsAdapter cardsAdapter;
     private List<Card> cardList;
@@ -59,14 +63,35 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         // Set the item click listener for the adapter
         cardsAdapter.setClickListener(this);
 
+        // Initialize the camera permission launcher
+        requestCameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        openCamera();
+                    } else {
+                        // Handle the case where permission is denied
+                    }
+                });
+
+        // Initialize the camera activity result launcher
+        cameraActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        // Handling the camera result
+                        Intent data = result.getData();
+                        if (data != null && data.getExtras() != null) {
+                            Bundle extras = data.getExtras();
+                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+                            // Use the bitmap as needed
+                        }
+                    }
+                });
+
         // Initialize the "Add Card" button and set an OnClickListener
         Button addCardButton = findViewById(R.id.btnAddCard); // Replace with your button's ID
-        addCardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestCameraPermission();
-            }
-        });
+        addCardButton.setOnClickListener(v -> requestCameraPermission());
 
         // Fetch cards using the user ID
         getCards("2"); // replace with actual user ID
@@ -159,7 +184,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
 
     private void requestCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
         } else {
             openCamera();
         }
@@ -180,7 +205,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+            cameraActivityResultLauncher.launch(cameraIntent);
         } else {
             // Handle the error (e.g. no camera app can handle the intent)
         }
