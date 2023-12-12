@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
+    android:paddingBottom="10dp"
     tools:context=".CardDetailsActivity">
 
 
@@ -47,10 +51,10 @@
         android:layout_width="306dp"
         android:layout_height="473dp"
         android:layout_marginStart="66dp"
-        android:layout_marginTop="60dp"
         android:layout_marginEnd="66dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2">
@@ -120,33 +124,18 @@
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:id="@+id/editButton"
-        android:layout_width="97dp"
-        android:layout_height="61dp"
-        android:layout_marginStart="157dp"
-        android:layout_marginEnd="157dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="#717171"
-        android:fontFamily="@font/sf_pro_rounded_regular"
-        android:text="Edit"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintBottom_toTopOf="@+id/deleteButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#000000"
         android:fontFamily="@font/sf_pro_rounded_regular"
         android:onClick="delCard"
         android:text="Delete Card"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

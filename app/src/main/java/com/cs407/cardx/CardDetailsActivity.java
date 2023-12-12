@@ -51,11 +51,8 @@ public class CardDetailsActivity extends AppCompatActivity {
         schoolTextView = findViewById(R.id.schoolTextView);
         bioTextView = findViewById(R.id.bioTextView);
 
-        editButton = findViewById(R.id.editButton);
         // Retrieve the Card object from the intent
         currentCard = (Card) getIntent().getSerializableExtra("card");
-
-        editButton.setVisibility(View.GONE);
 
         if (currentCard != null) {
             // Set the TextViews with the Card's details
