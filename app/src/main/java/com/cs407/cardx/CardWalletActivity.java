@@ -23,6 +23,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +38,6 @@ import retrofit2.Response;
 public class CardWalletActivity extends AppCompatActivity implements CardsAdapter.ItemClickListener {
 
     private static final int CARD_DETAILS_REQUEST = 1; // Unique request code
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-    private static final int CAMERA_REQUEST_CODE = 101;
-    private ActivityResultLauncher<String> requestCameraPermissionLauncher;
-    private ActivityResultLauncher<Intent> cameraActivityResultLauncher;
     private RecyclerView cardsRecyclerView;
     private CardsAdapter cardsAdapter;
     private List<Card> cardList;
@@ -70,35 +69,9 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         // Set the item click listener for the adapter
         cardsAdapter.setClickListener(this);
 
-        // Initialize the camera permission launcher
-        requestCameraPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (isGranted) {
-                        openCamera();
-                    } else {
-                        // Handle the case where permission is denied
-                    }
-                });
-
-        // Initialize the camera activity result launcher
-        cameraActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        // Handling the camera result
-                        Intent data = result.getData();
-                        if (data != null && data.getExtras() != null) {
-                            Bundle extras = data.getExtras();
-                            Bitmap imageBitmap = (Bitmap) extras.get("data");
-                            // Use the bitmap as needed
-                        }
-                    }
-                });
-
         // Initialize the "Add Card" button and set an OnClickListener
-        Button addCardButton = findViewById(R.id.btnAddCard); // Replace with your button's ID
-        addCardButton.setOnClickListener(v -> requestCameraPermission());
+        Button addCardButton = findViewById(R.id.btnAddCard);
+        addCardButton.setOnClickListener(v -> openQRScanner());
 
         ImageView profile = findViewById(R.id.ivPersonIcon);
         profile.setOnClickListener(new View.OnClickListener() {
@@ -176,10 +149,20 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         });
     }
 
+    private void openQRScanner() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setOrientationLocked(true); // Lock orientation
+        integrator.setCaptureActivity(PortraitCaptureActivity.class); // Use a custom CaptureActivity
+        integrator.setPrompt("Scan a QR Code");
+        integrator.setOrientationLocked(false);
+        integrator.setBeepEnabled(false);
+        integrator.initiateScan();
+    }
+
     //add card should be called after you already have the card you want to add
-    public void addCard(View view) {
+    public void addCard(String userId) {
         CardService service = ApiClient.getClient();
-        service.addCard(sharedPreferences.getString("userId",""), "7").enqueue(new Callback<ResponseBody>() {
+        service.addCard(sharedPreferences.getString("userId",""), userId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
@@ -187,7 +170,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
                     Log.d("CardWalletActivity", "Card added successfully");
 
                     // Assuming you want to refresh the card list after adding
-                    getCards(sharedPreferences.getString("userId","")); // Replace "2" with the actual userId
+                    getCards(sharedPreferences.getString("userId",""));
 
                     // inform the user of success
                     Toast.makeText(CardWalletActivity.this, "Card added successfully", Toast.LENGTH_SHORT).show();
@@ -211,54 +194,21 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
         });
     }
 
-    private void requestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
-        } else {
-            openCamera();
-        }
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else {
-                // Permission was denied. Handle the error.
-            }
-        }
-    }
-
-    private void openCamera() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            cameraActivityResultLauncher.launch(cameraIntent);
-        } else {
-            // Handle the error (e.g. no camera app can handle the intent)
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
-            // Handling the camera result
-            if (data != null && data.getExtras() != null) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                // Use the bitmap as needed
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                // Assuming the QR code contains a single number (userId)
+                String scannedUserId = result.getContents();
+                // Call addCard with the scanned user ID
+                addCard(scannedUserId);
             }
-        } else if (requestCode == CARD_DETAILS_REQUEST && resultCode == RESULT_OK) {
-            // Handling the result from CardDetailsActivity
-            // The card was deleted, refresh the cards list
-            getCards(sharedPreferences.getString("userId", "")); // Replace "2" with the actual userId
         }
     }
-
-
-
 
 }
