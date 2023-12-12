@@ -66,8 +66,6 @@ public class SignupActivity extends AppCompatActivity {
                         bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
                         byte[] byteArray = stream.toByteArray();
                         avatar = Base64.encodeToString(byteArray, 0);
-                        System.out.println(avatar);
-                        System.out.println(avatar.length());
                     }
                     catch(Exception e) {
                         Toast.makeText(SignupActivity.this, "Encoding of Image failed. Check Logcat for details.", Toast.LENGTH_LONG).show();

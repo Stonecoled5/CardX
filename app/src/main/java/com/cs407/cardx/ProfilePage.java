@@ -151,10 +151,7 @@ public class ProfilePage extends AppCompatActivity {
         avatarView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(canEdit);
                 if (canEdit) {
-                    System.out.println(Build.VERSION.SDK_INT);
-                    System.out.println(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         handleAvatarEdit();
                     }
@@ -261,9 +258,7 @@ public class ProfilePage extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public void handleAvatarEdit() {
-        System.out.println("ReadMediaImags1");
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("ReadMediaImags");
             ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES}, PERMISSIONS_REQUEST_READ_MEDIA_IMAGES);
         }
         else if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) != PackageManager.PERMISSION_GRANTED) {
