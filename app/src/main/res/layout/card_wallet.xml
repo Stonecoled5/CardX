@@ -10,11 +10,10 @@
         android:orientation="vertical"
         android:layout_above="@+id/btnAddCard">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -28,10 +27,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="@font/sf_pro_rounded"
+                    android:fontFamily="@font/sf_pro_rounded_regular"
                     android:text="CardX"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/ivPersonIcon"
@@ -39,7 +40,7 @@
                     android:layout_height="49dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    app:srcCompat="@drawable/profile_icon" />
+                    app:srcCompat="@drawable/avatar" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -62,6 +63,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#000000"
-        android:fontFamily="@font/sf_pro_rounded"
+        android:fontFamily="@font/sf_pro_rounded_regular"
         android:text="Add Card" />
 </RelativeLayout>

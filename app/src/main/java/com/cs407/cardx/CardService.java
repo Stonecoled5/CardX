@@ -13,8 +13,8 @@ public interface CardService {
     @GET("getCards")
     Call<CardIdsResponse> getCards(@Query("userId") String userId);
 
-    @GET("getUserInfo")
-    Call<Card> getUserInfo(@Query("userId") String userId);
+    @GET("getUsersInfo")
+    Call<List<Card>> getUsersInfo(@Query("userIds") String userId);
 
     @POST("addCard")
     Call<ResponseBody> addCard(

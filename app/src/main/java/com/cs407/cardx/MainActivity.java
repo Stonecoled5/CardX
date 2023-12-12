@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (isLoggedIn) {
             // User is already logged in, go directly to CardWalletActivity
-            Intent intent = new Intent(MainActivity.this, QR.class);
+            Intent intent = new Intent(MainActivity.this, CardWalletActivity.class);
             startActivity(intent);
             finish(); // Close MainActivity
             return; // Prevents the rest of the code from executing

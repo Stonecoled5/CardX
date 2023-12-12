@@ -150,6 +150,15 @@ public class ProfilePage extends AppCompatActivity {
                 }
             }
         });
+
+        ImageView Qrexample = findViewById(R.id.imageViewQRCode);
+        Qrexample.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), QR.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void editUserInfo(String userId, String company, String occupation, String email, String phone, String school, String name, String bio, String avatar) {

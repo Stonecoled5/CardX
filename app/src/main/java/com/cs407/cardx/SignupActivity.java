@@ -1,11 +1,19 @@
 package com.cs407.cardx;
 
+import static java.security.AccessController.getContext;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +21,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -47,13 +56,26 @@ public class SignupActivity extends AppCompatActivity {
                 String firstName = firstNameEditText.getText().toString();
                 String lastName = lastNameEditText.getText().toString();
                 String phone = phoneEditText.getText().toString();
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.avatar);
+                String avatar = null;
+                if (bitmap != null) {
+                    try {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        avatar = Base64.encodeToString(byteArray, 0);
+                    }
+                    catch(Exception e) {
+                        Toast.makeText(SignupActivity.this, "Encoding of Image failed. Check Logcat for details.", Toast.LENGTH_LONG).show();
+                    }
+                }
 
-                registerUser(email, password, firstName, lastName, phone);
+                registerUser(email, password, firstName, lastName, phone, avatar);
             }
         });
     }
 
-    private void registerUser(String email, String password, String firstName, String lastName, String phone) {
+    private void registerUser(String email, String password, String firstName, String lastName, String phone, String avatar) {
         final String registerUrl = "https://verified-jay-correct.ngrok-free.app/register";
 
         executorService.execute(() -> {
@@ -69,7 +91,8 @@ public class SignupActivity extends AppCompatActivity {
                 String postParameters = "email=" + URLEncoder.encode(email, "UTF-8") +
                         "&password=" + URLEncoder.encode(password, "UTF-8") +
                         "&name=" + URLEncoder.encode(firstName + " " + lastName, "UTF-8") +
-                        "&phone=" + URLEncoder.encode(phone, "UTF-8");
+                        "&phone=" + URLEncoder.encode(phone, "UTF-8") +
+                        "&avatar=" + URLEncoder.encode(avatar, "UTF-8");
 
                 // Send the request
                 OutputStream os = conn.getOutputStream();
