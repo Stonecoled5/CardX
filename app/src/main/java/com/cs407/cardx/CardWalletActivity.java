@@ -90,6 +90,7 @@ public class CardWalletActivity extends AppCompatActivity implements CardsAdapte
     }
 
     private void getCards(String userId) {
+        cardList.clear();
         cardService.getCards(userId).enqueue(new Callback<CardIdsResponse>() {
             @Override
             public void onResponse(@NonNull Call<CardIdsResponse> call, @NonNull Response<CardIdsResponse> response) {
