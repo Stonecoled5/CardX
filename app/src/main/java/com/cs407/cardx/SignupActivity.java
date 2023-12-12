@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Scanner;
@@ -61,9 +63,11 @@ public class SignupActivity extends AppCompatActivity {
                 if (bitmap != null) {
                     try {
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
                         byte[] byteArray = stream.toByteArray();
                         avatar = Base64.encodeToString(byteArray, 0);
+                        System.out.println(avatar);
+                        System.out.println(avatar.length());
                     }
                     catch(Exception e) {
                         Toast.makeText(SignupActivity.this, "Encoding of Image failed. Check Logcat for details.", Toast.LENGTH_LONG).show();
@@ -122,6 +126,7 @@ public class SignupActivity extends AppCompatActivity {
                         // Log the error response in Logcat
                         //Log.e(logTag, "Sign up failed with response code " + responseCode + ": " + response);
                         //Toast.makeText(SignupActivity.this, email, Toast.LENGTH_SHORT).show();
+                        Log.e("Login", String.valueOf(responseCode));
                         Toast.makeText(SignupActivity.this, "Sign up failed. Check Logcat for details.", Toast.LENGTH_LONG).show();
                     }
                 });

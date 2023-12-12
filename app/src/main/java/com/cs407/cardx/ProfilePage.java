@@ -1,5 +1,6 @@
 package com.cs407.cardx;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.READ_MEDIA_IMAGES;
 import static android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
 import static android.content.ContentValues.TAG;
@@ -9,9 +10,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts.*;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -54,6 +59,7 @@ public class ProfilePage extends AppCompatActivity {
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
     private ImageView avatarView;
     private EditText companyEdit, occupationEdit, emailEdit, phoneEdit, schoolEdit, nameEdit, bioEdit;
+    private static final int PICK_FROM_GALLERY = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,14 +151,22 @@ public class ProfilePage extends AppCompatActivity {
         avatarView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println(canEdit);
                 if (canEdit) {
-                    handleAvatarEdit();
+                    System.out.println(Build.VERSION.SDK_INT);
+                    System.out.println(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        handleAvatarEdit();
+                    }
+                    else {
+                        handleAvatarEditOld();
+                    }
                 }
             }
         });
 
-        ImageView Qrexample = findViewById(R.id.imageViewQRCode);
-        Qrexample.setOnClickListener(new View.OnClickListener() {
+        ImageView Qr = findViewById(R.id.imageViewQRCode);
+        Qr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), QR.class);
@@ -245,13 +259,14 @@ public class ProfilePage extends AppCompatActivity {
         bioEdit.setText(sharedPreferences.getString("bio",""));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public void handleAvatarEdit() {
-        int permission1 = ActivityCompat.checkSelfPermission(this.getApplicationContext(), READ_MEDIA_IMAGES);
-        int permission2 = ActivityCompat.checkSelfPermission(this.getApplicationContext(), READ_MEDIA_VISUAL_USER_SELECTED);
-        if (permission1 == PackageManager.PERMISSION_DENIED) {
+        System.out.println("ReadMediaImags1");
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("ReadMediaImags");
             ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES}, PERMISSIONS_REQUEST_READ_MEDIA_IMAGES);
         }
-        if (permission2 == PackageManager.PERMISSION_DENIED) {
+        else if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_VISUAL_USER_SELECTED}, PERMISSIONS_REQUEST_READ_MEDIA_VISUAL_USER_SELECTED);
         }
         else {
@@ -263,25 +278,54 @@ public class ProfilePage extends AppCompatActivity {
         }
     }
 
+    public void handleAvatarEditOld() {
+        if (ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{READ_EXTERNAL_STORAGE}, PICK_FROM_GALLERY);
+        }
+        else {
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(galleryIntent, PICK_FROM_GALLERY);
+            PickVisualMedia.VisualMediaType mediaType = (PickVisualMedia.VisualMediaType) PickVisualMedia.ImageOnly.INSTANCE;
+            PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
+                    .setMediaType(mediaType)
+                    .build();
+            pickMedia.launch(request);
+        }
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST_READ_MEDIA_IMAGES) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                readMediaGranted = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            if (requestCode == PERMISSIONS_REQUEST_READ_MEDIA_IMAGES) {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    readMediaGranted = true;
+                }
+            } else if (requestCode == PERMISSIONS_REQUEST_READ_MEDIA_VISUAL_USER_SELECTED) {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    readMediaVisualUserGranted = true;
+                }
+            }
+            if (readMediaGranted && readMediaVisualUserGranted) {
+
+                handleAvatarEdit();
             }
         }
-        else if (requestCode == PERMISSIONS_REQUEST_READ_MEDIA_VISUAL_USER_SELECTED) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                readMediaVisualUserGranted = true;
+        else {
+            switch (requestCode) {
+                case PICK_FROM_GALLERY:
+                    // If request is cancelled, the result arrays are empty.
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(galleryIntent, PICK_FROM_GALLERY);
+                    } else {
+                        //do something like displaying a message that he didn`t allow the app to access gallery and you wont be able to let him select from gallery
+                    }
+                    break;
             }
-        }
-        if (readMediaGranted && readMediaVisualUserGranted) {
-            handleAvatarEdit();
         }
     }
 
